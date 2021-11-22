@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="helloWorldMessageProvider" class="IoC.provider.HelloWorldMessageProvider" depends-on="singer"> <!-- Зависит от другого компонента, поэтому singer нужно получить первым-->
+        <property name="singer" ref="singer"/>
+<!--        Указывать на родительский бин, а не на внутренний-->
+<!--        <property name="singer">-->
+<!--            <ref parent="singer"/>-->
+<!--        </property>-->
+    </bean>
+
+    <!--    Внедрение зависимостей через конструктор -->
+    <bean id="providerConstructor1" class="IoC.provider.ConfigurableMessageProvider">
+          <constructor-arg value="providerConstructor1"/>
+    </bean>
+    <bean id="providerConstructor2" class="IoC.provider.ConfigurableMessageProvider">
+        <constructor-arg index="0" type="java.lang.String" value="providerConstructor2"/>
+        <constructor-arg index="1" type="java.lang.Integer" value="100"/>
+    </bean>
+    <!--    Или так сокращенно-->
+<!--    <bean id="providerConstructor1" class="ConfigurableMessageProvider"-->
+<!--          c:message="providerConstructor2"/>-->
+<!--    <bean id="providerConstructor2" class="ConfigurableMessageProvider"-->
+<!--          c:_0="providerConstructor2"-->
+<!--          c:_1="100"/>-->
+
+    <!--    Внедрение зависимостей через метод установки -->
+    <bean id="standardOutMessageRenderer" class="IoC.renderer.StandardOutMessageRenderer">
+        <property name="messageProvider" ref="helloWorldMessageProvider"/>
+    </bean>
+    <!--    Или так сокращенно-->
+<!--    <bean id="renderer" class="StandardOutMessageRenderer"-->
+<!--          p:messageProvider-ref="provider"/>-->
+
+    <bean id="rendererConstructor1" class="IoC.renderer.StandardOutMessageRenderer"
+          p:messageProvider-ref="providerConstructor1"/>
+
+    <bean id="rendererConstructor2" class="IoC.renderer.StandardOutMessageRenderer"
+          p:messageProvider-ref="providerConstructor2"/>
+
+    <bean id="spelConst" class="IoC.other.SpelConst"/>
+
+<!--    Использование spel, внедрение коллекций-->
+    <bean id="singer" class="IoC.other.Singer">
+        <property name="name" value="Super #{spelConst.name}"/>
+        <property name="age" value="#{spelConst.age - 2}"/>
+        <property name="heigh" value="1.75"/>
+        <property name="russian" value="false"/>
+        <property name="salary" value="#{spelConst.salary + 20000}"/>
+        <property name="map">
+            <map>
+                <entry key="key1xml" value="Value1xml"/>
+                <entry key="key2xml" value-ref="providerConstructor1"/>
+            </map>
+        </property>
+        <property name="prop">
+            <props>
+                <prop key="firstName">Hello</prop>
+                <prop key="secondName">World</prop>
+            </props>
+        </property>
+        <property name="set">
+            <set>
+                <value>I believe</value>
+                <ref bean="providerConstructor1"/>
+            </set>
+        </property>
+        <property name="list">
+            <list>
+                <value>Everything is possible</value>
+                <ref bean="providerConstructor1"/>
+            </list>
+        </property>
+    </bean>
+
+<!--    Дочерний бин singerChild наследует родительский singer и меняет некоторые свои параметры, остальные остаются от родителя-->
+    <bean id="singerChild" class="IoC.other.Singer" parent="singer">
+        <property name="name" value="Child"/>
+        <property name="age" value="0"/>
+    </bean>
+
+<!--    именование: сперва используется id, потом первое name, потом тип, а потом исключение todo. Разделители - ,;-->
+    <bean id="string1" name="str s1,str1;strng1" class="java.lang.String">
+        <constructor-arg value="ValueForString1"/>
+    </bean>
+<!--    Задать псевдоним-->
+    <alias name="string1" alias="st1"/>
+    <bean name="string2" class="java.lang.String">
+        <constructor-arg value="ValueForString2"/>
+    </bean>
+    <alias name="string2" alias="st2"/>
+    <bean name="string3" class="java.lang.String"/>
+    <bean class="java.lang.String"/>
+    <bean class="java.lang.String"/>
+
+<!--    Автосвязывание. lazy-init="true" - получать экземпляр компонента по первому запросу, а не во время начальной загрузки-->
+    <bean id="fooOne" class="IoC.other.Foo" primary="true"/> <!--primary - Если есть несколько кандидатов на внедрение, то использовать этот приоритетный-->
+    <bean id="barOne" class="IoC.other.Bar"/>
+    <bean id="targetByName" autowire="byName" class="IoC.other.TargetAutowire" lazy-init="true"/>
+    <bean id="targetByType" autowire="byType" class="IoC.other.TargetAutowire" lazy-init="true"/>
+    <bean id="targetConstructor" autowire="constructor" class="IoC.other.TargetAutowire" lazy-init="true"/>
+
+    <!--    Внедрение через метод поиска - работает значительно дольше. Используется библиотека CGLIB для динамического расширения байт-кода-->
+    <!--    <bean id="singer" class="com.apress.prospring5.Singer" scope="prototype"/>-->
+    <!--    <bean id="abstractLookupBean" class="com.apress.prospring5.AbstractLookupDemoBean">-->
+    <!--        <lookup-method name="getMySinger" bean="singer"/>-->
+    <!--    </bean>-->
+    <!--    <bean id="standardLookupBean" class="com.apress.prospring5.StandardLookupDemoBean">-->
+    <!--        <property name="mySinger" ref="singer"/>-->
+    <!--    </bean>-->
+
+    <!--    Замена метода - работает долго-->
+    <!--    <bean id="methodReplacer" class="com.apress.prospring5.FormatMessageReplacer"/>-->
+    <!--    <bean id="replacementTarget" class="com.apress.prospring5.ReplacementTarget">-->
+    <!--        <replaced-method name="formatMessage" replacer="methodReplacer">-->
+    <!--            <arg-type>String</arg-type>-->
+    <!--        </replaced-method>-->
+    <!--    </bean>-->
+    <!--    <bean id="standardTarget" class="com.apress.prospring5.ReplacementTarget"/>-->
+
+</beans>
