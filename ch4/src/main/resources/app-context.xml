@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd"
+       default-lazy-init="true">
+<!--    default-lazy-init="true" - получать экземпляры только при запросе-->
+<!--    если у всех init-method="init", то можно вынести вверх -->
+<!--    default-init-method="init"-->
+
+    <bean id="singerOne" class="configurationAndBootstrap.Singer"
+          init-method="init"
+          destroy-method="close"
+          p:name="John Mayer" p:age="39"/>
+<!--    Выполнение метода при создании компонента-->
+<!--    init-method="init"-->
+<!--    Выполнение метода при уничтожении компонента-->
+<!--    destroy-method="destroy"-->
+
+    <bean id="singerTwo" class="configurationAndBootstrap.Singer"
+          p:age="72"/>
+
+    <bean id="digest1" class="configurationAndBootstrap.messageDigest.MessageDigestFactoryBean"
+          p:algorithmName="SHA1"/>
+    <bean id="digest2" class="configurationAndBootstrap.messageDigest.MessageDigestFactoryBean"/>
+
+    <bean id="digester" class="configurationAndBootstrap.messageDigest.MessageDigester"
+          p:digest1-ref="digest1"
+          p:digest2-ref="digest2"/>
+
+    <bean id="shaDigestFactory" class="configurationAndBootstrap.messageDigest.MessageDigestFactory"
+          p:algorithmName="SHA1"/>
+<!--    При создании бина использовать фабричный бин и фабричный метод-->
+    <bean id="shaDigest"
+          factory-bean="shaDigestFactory"
+          factory-method="createInstance">
+    </bean>
+
+    <bean id="defaultDigestFactory" class="configurationAndBootstrap.messageDigest.MessageDigestFactory"/>
+    <bean id="defaultDigest"
+          factory-bean="defaultDigestFactory"
+          factory-method="createInstance"/>
+
+    <bean id="digesterFactory" class="configurationAndBootstrap.messageDigest.MessageDigester"
+          p:digest1-ref="shaDigest"
+          p:digest2-ref="defaultDigest"/>
+
+    <bean id="publisher" class="configurationAndBootstrap.events.Publisher"/>
+
+    <bean id="messageEventListener" class="configurationAndBootstrap.events.MessageEventListener"/>
+
+</beans>

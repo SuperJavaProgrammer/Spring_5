@@ -123,4 +123,9 @@
     <!--    </bean>-->
     <!--    <bean id="standardTarget" class="com.apress.prospring5.ReplacementTarget"/>-->
 
+    <!--    Аналог @PropertySource(value = "classpath:message.properties") -->
+    <!--    <context:property-placeholder location="classpath:message.properties" local-override="true"/>-->
+    <!--    local-override="true" переопределить существующие свойства из файла, -->
+    <!--    "${message}" для извлечения значений из файла-->
+
 </beans>
