@@ -12,6 +12,7 @@
     <modules>
         <module>ch3</module>
         <module>ch4</module>
+        <module>ch6</module>
     </modules>
 
     <dependencies>
