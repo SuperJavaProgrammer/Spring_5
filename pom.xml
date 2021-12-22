@@ -17,6 +17,7 @@
         <module>ch8</module>
         <module>ch9</module>
         <module>ch12</module>
+        <module>ch16</module>
     </modules>
 
     <dependencies>
@@ -184,13 +185,14 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <source>1.11</source>
-                    <target>1.11</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <!--not work with 1.11-->
                 <version>3.2.2</version>
             </plugin>
         </plugins>
